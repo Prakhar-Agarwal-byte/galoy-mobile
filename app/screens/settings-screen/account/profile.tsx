@@ -15,7 +15,6 @@ import { useCallback, useEffect, useRef, useState } from "react"
 import messaging from "@react-native-firebase/messaging"
 import crashlytics from "@react-native-firebase/crashlytics"
 import { logLogout } from "@app/utils/analytics"
-import { PersistentState } from "@app/store/persistent-state/state-migrations"
 
 gql`
   query username {
@@ -65,10 +64,13 @@ export const ProfileScreen: React.FC = () => {
           })
           if (data && data.me) {
             profiles.push({
-              username: data.me.username ? data.me.username : `Account ${counter++}`,
+              username: data.me.username ? data.me.username : `Account ${counter}`,
               token,
               selected: token === curToken,
             })
+            if (!data.me.username) {
+              counter += 1
+            }
           }
         } catch (err) {
           console.error(`Failed to fetch username for token ${token}`, err)
@@ -148,13 +150,11 @@ export const ProfileScreen: React.FC = () => {
 const Profile: React.FC<ProfileProps> = ({ username, token, selected }) => {
   const styles = useStyles()
   const { LL } = useI18nContext()
-  const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
-  const { persistentState, updateState } = usePersistentStateContext()
+  const { updateState } = usePersistentStateContext()
   const client = useApolloClient()
   const [userLogoutMutation] = useUserLogoutMutation({
     fetchPolicy: "no-cache",
   })
-  const oldToken = persistentState.galoyAuthToken
 
   const logout = useCallback(async (): Promise<void> => {
     try {
