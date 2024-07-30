@@ -4,8 +4,8 @@
  * If the user isn't logged in, it shows Login or Create Account
  * Later on, this will support switching between accounts
  */
-import { TouchableOpacity, View } from "react-native"
-import { TouchableWithoutFeedback } from "react-native-gesture-handler"
+import { View } from "react-native"
+import { TouchableWithoutFeedback, TouchableOpacity } from "react-native-gesture-handler"
 
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { useSettingsScreenQuery } from "@app/graphql/generated"
@@ -49,10 +49,12 @@ export const AccountBanner = () => {
       }
     >
       <View style={styles.outer}>
-        <AccountIcon size={30} />
-        <Text type="p2">
-          {isUserLoggedIn ? usernameTitle : LL.SettingsScreen.logInOrCreateAccount()}
-        </Text>
+        <View style={styles.inner}>
+          <AccountIcon size={30} />
+          <Text type="p2">
+            {isUserLoggedIn ? usernameTitle : LL.SettingsScreen.logInOrCreateAccount()}
+          </Text>
+        </View>
         {isUserLoggedIn && (
           <TouchableOpacity style={styles.switch} onPress={handleSwitchPress}>
             <GaloyIcon name="switch" size={20} color={colors.primary} />
@@ -74,13 +76,19 @@ export const AccountIcon: React.FC<{ size: number }> = ({ size }) => {
 }
 
 const useStyles = makeStyles(() => ({
+  inner: {
+    display: "flex",
+    flexDirection: "row",
+    alignItems: "center",
+    columnGap: 12,
+  },
   outer: {
     height: 70,
     padding: 4,
     display: "flex",
     flexDirection: "row",
     alignItems: "center",
-    columnGap: 12,
+    justifyContent: "space-between",
   },
   switch: {
     display: "flex",
